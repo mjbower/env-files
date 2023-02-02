@@ -1,0 +1,124 @@
+alias cat='bat'
+alias kevall='kubectl  get events --all-namespaces --sort-by=.metadata.creationTimestamp -w'
+alias kallw='kubectl get pods --all-namespaces -o wide --sort-by=.spec.nodeName'
+alias subl="open -a /Applications/Sublime\ Text.app"
+# new kubectl aliases
+alias kram='kubectl get pods -o json -n kube-system | jq -r '"'"'.items[] | .spec.containers[].resources.requests.memory + " | " + .metadata.name'"'"''
+alias kpods='kubectl get po -o json --all-namespaces | jq '"'"'.items | group_by(.spec.nodeName) | map({"nodeName": .[0].spec.nodeName, "count": length}) | sort_by(.count)'"'"''
+alias kx='kubectx'
+alias kk='kubectl delete pod'
+alias kkf='kubectl delete pod --force --grace-period=0'
+alias kimages='kpo -o json | jq '"'"' .items[].status.containerStatuses[].image'"'"''
+alias kaimages='kpo --all-namespaces -o json | jq '"'"' .items[].status.containerStatuses[].image'"'"''
+alias knodes='kubectl get nodes --all-namespaces -o=custom-columns=NAME:.metadata.name,ZONE:.metadata.labels."failure-domain\.beta\.kubernetes\.io/zone"'
+alias ket='kubectl exec -it'
+alias kc='k config use-context'
+alias kg='k config get-contexts'
+alias kpol='kubectl get netpol -oyaml'
+alias ke='kubectl exec -it'
+alias kv='kubectl view-secret'
+alias kcopysecret='kubectl get secret bxregistry --namespace=default --export -o yaml | kubectl apply --namespace=$1 -f -'
+alias kingress-all='kubectl get service --all-namespaces  -o=custom-columns="NAME:.metadata.name,IP:.status.loadBalancer.ingress[*].ip,PORT:.spec.ports[*].targetPort" '
+alias kingress-public='kubectl get service --all-namespaces  -o=custom-columns="NAME:.metadata.name,IP:.status.loadBalancer.ingress[*].ip,PORT:.spec.ports[*].targetPort" | grep -v none'
+alias kindup='kind create cluster --config /Users/martin/development/kubernetes/examples/kind/1ma2nodes.yaml'
+# list all open ports  kubectl get svc --all-namespaces -o json | jq -r ' .items[] | select(.spec.type=="LoadBalancer" or .spec.type=="NodePort") | "\(.metadata.name) \(.status.loadBalancer.ingress[0].ip) \(.spec.ports[].port)"' | grep -v private-cr
+#kubectl  get ing --all-namespaces  | awk ' { print $2, $3, $4, $5 $6 } ' | column -t
+#
+# XX to be added   use '"'"'   to replace a single quote inside a single quote
+# NS=default; kubectl get pod -n $NS | grep "ContainerCreating \|Init:0/1\|ContainerCreating\|ImagePullBackOff" | awk '{print $1}'|xargs -I % sh -c "kubectl -n $NS describe pod % "
+alias kportscan="kubectl run --image=mateothegreat/docker-alpine-nmap  --rm -i -t nm --  -Pn -p9200,9300 elasticsearch"
+# MY_POD=$(kubectl get pods --all-namespaces -lapp=my-awesome-app -o jsonpath='{.items[0].metadata.name})
+# delete non running pods
+# kubectl delete $(kubectl get pod --no-headers --field-selector=status.phase!=Running -o name )
+#
+# kubectl get nodes -o json | jid -q | pbcopy          jis example to clipboard
+alias tp=telepresence
+alias tpdeploy='kubectl create -f /Users/martin/development/kubernetes/examples/telepresence/tpdeploy.yaml'
+alias tpip='PROMPT_EOL_MARK="" && kubectl get svc -l name=tp-martin-svc -o jsonpath='"'"'{.items[].status.loadBalancer.ingress[0].ip}'"'"''
+alias tpcurl='curl `tpip` && echo `tpip`'
+alias tpundeploy='kubectl delete -f /Users/martin/development/kubernetes/examples/telepresence/tpdeploy.yaml'
+alias cpubn="kubectl create -f ~/development/kubernetes/examples/nginx-svc-deploy/all-in-one-public.yaml"
+alias dpubn="kubectl delete -f ~/development/kubernetes/examples/nginx-svc-deploy/all-in-one-public.yaml"
+alias cprivn="kubectl create -f ~/development/kubernetes/examples/nginx-svc-deploy/all-in-one-private.yaml"
+alias dprivn="kubectl delete -f ~/development/kubernetes/examples/nginx-svc-deploy/all-in-one-private.yaml"
+alias setuphelm="kubectl apply -f https://raw.githubusercontent.com/IBM-Cloud/kube-samples/master/rbac/serviceaccount-tiller.yaml && helm init --service-account tiller"
+alias shrug="echo '¯\\_(ツ)_/¯' && echo '¯\\_(ツ)_/¯' | pbcopy"
+alias sublime="open -a /Applications/Sublime\ Text.app"
+alias grep='grep --color'
+alias ll='ls -l'
+alias k='kubectl'
+alias ic='ibmcloud'
+alias ksys='kubectl -n kube-system'
+alias kdelall='kubectl delete all --all'
+alias kall='kubectl get pods --all-namespaces'
+alias kbxs='kubectl bxsubnets'
+alias kpo='kubectl get pods'
+alias kpow='kubectl get pods -w'
+alias kgc='kubectl config get-contexts'
+alias kuc='kubectl config use-context'
+alias krestarts="kubectl get pods --all-namespaces --sort-by='.status.containerStatuses[0].restartCount'"
+alias kgettoken="kubectl config view -o jsonpath='{.users[0].user.auth-provider.config.id-token}' && echo"
+#
+# Knative
+alias kna="cd /Users/martin/development/kubernetes/knative"
+# Docker stuff here
+alias d='/usr/local/bin/docker'
+alias dcrm='docker ps -aq --no-trunc | xargs docker rm'
+alias phg='cat ~/.zsh_history|grep '
+alias phgrep='cat ~/.persistent_history|grep '
+alias phtail='tail ~/.persistent_history|grep '
+alias ddangling='docker rmi $(docker images --quiet --filter "dangling=true")'
+# phgrep bx | awk -F "|" '{print $2}' | sort -u
+alias phtail='tail -50  ~/.persistent_history'
+alias portainer='docker run -d --privileged --name portainer -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v /opt/portainer:/data portainer/portainer -H unix:///var/run/docker.sock'
+alias minikill='minikube delete; sudo rm -rf ~/.minikube; sudo rm -rf ~/.kube'
+alias lclusters="bx cs clusters --json | jq --raw-output '.[] .name '"
+alias lcl="bx cs clusters --json | jq -r '.[] .name'"
+alias bxconfig="for i in \`lclusters\` ; do  bx cs cluster-config \$i -s ; done"
+alias bxg="bx target -g"
+alias bxworkers="for i in \`lclusters\` ; do  echo \$i; bx cs workers \$i -s ; echo ; done"
+alias bxgetall="for i in \`lclusters\` ; do  echo \$i; bx cs cluster-get \$i -s ; echo ; done"
+alias bxgetalbs="for i in \`lclusters\` ; do  echo \$i; bx cs albs --cluster \$i --json | jq -r ' .[]  | \"\(.albID) \(.albType) \(.albip) \(.state)\"\' ; echo ; done"
+alias bxcs='bx cs clusters'
+alias upstairs="open 'smb://martin:xxxxxx@192.168.0.18/martin'"
+#
+alias shrug="printf '¯\_(ツ)_/¯' | pbcopy"
+alias flipt="printf '(╯°□°)╯︵ ┻━┻' | pbcopy"
+alias fight="printf '(ง'̀-'́)ง' | pbcopy"
+
+alias speed='speedtest-cli'
+alias bxk='bx cs cluster-config'
+alias bxusers='bx account users'
+
+alias f='fff'
+
+alias wanip='dig @resolver1.opendns.com ANY myip.opendns.com +short'
+
+#alias nonprod='ic target -c 3ea5ee9748804c23e6fdeeea95957eca  -r eu-de && ic ks clusters'
+#alias prod='ic target -c 8e9b64c0c8744af4b38828f8c54f5999  -r eu-de && ic ks clusters'
+#alias oldacc='ic target -c 9eeade219ba954e9734c9934fee033cc && ic ks clusters'
+
+#alias ipsecstatus="kubectl exec -n default $(kubectl get pod -n default -l app=strongswan,release=vpn -o jsonpath='{ .items[0].metadata.name }') -- ipsec status"
+alias ipsecstatus='kubectl exec -n default  `kubectl get pod -n default -l app=strongswan,release=vpn -o jsonpath='"'"'{ .items[0].metadata.name }'"'"'` -- ipsec status'
+
+alias preshared="head -c 4096 /dev/urandom | openssl sha256 | cut -b1-32"
+alias linuxpreshared="   head -c 4096 /dev/urandom | sha256sum | cut -b1-32"
+alias dp="docker run -it bxtools-prod bash"
+alias dnp="docker run -it bxtools-nonprod bash"
+alias dsecret="kubectl get secret apmoller-registry -ojson | jq -r '.data[\".dockerconfigjson\"]' | base64 --decode"
+alias token='ic target -g aop-cdt && ic ks cluster config --cluster aop-cdt-emea'
+
+alias twipe='sl | lolcat'
+
+# locate these files using the appropriate path on your SD
+#find /path/to/where/music/is/stored -name '._*' -print 
+
+# locate and delete these files 
+# Only do this if you are certain that files you found were the files you 
+# wish to purge
+#find /path/to/where/music/is/stored -name '._*' -print -exec rm \{} \;
+
+# dd speed check
+#dd if=/dev/zero of=temp.txt bs=1M count=1204 oflag=direct
+#dd of=/dev/zero if=temp.txt bs=1M count=1204 iflag=direct
+
